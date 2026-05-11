@@ -1,14 +1,9 @@
 from pathlib import Path
 from azure.storage.blob import BlobServiceClient
 from logger_config import setup_logger
-import os
-from dotenv import load_dotenv
+from key_vault_config import get_secret
 
-load_dotenv()
-
-connection_string = os.getenv(
-    "AZURE_STORAGE_CONNECTION_STRING"
-)
+connection_string = get_secret("azure-storage-connection-string")
 
 logger = setup_logger()
 
