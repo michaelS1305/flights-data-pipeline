@@ -7,7 +7,6 @@ connection_string = get_secret("azure-storage-connection-string")
 
 logger = setup_logger()
 
-connection_string = "hard coded secret"
 container_name = "raw"
 
 def upload_run_folder_to_blob(run_folder: Path):
