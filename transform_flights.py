@@ -183,5 +183,3 @@ def build_processed_flights():
         )
 
         raise
-
-build_processed_flights()

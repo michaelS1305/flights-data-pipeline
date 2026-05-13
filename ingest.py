@@ -39,7 +39,7 @@ def ingest_flights():
         logger.info(f"Raw JSON saved successfully to: {file_path}")
         logger.info("Flights ingestion process finished successfully")
 
-        return folder
+        return file_path
 
     except Exception as e:
         logger.error(f"Flights ingestion process failed: {e}")
