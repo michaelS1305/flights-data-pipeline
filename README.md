@@ -1,21 +1,25 @@
 # Flights Data Pipeline
 
-Cloud-based data engineering project that ingests flight data from the Israeli Government API, processes and transforms the data into analytics-ready datasets, and stores all layers in Azure Blob Storage.
+Cloud-based data engineering project that ingests flight data from the Israeli Government API, stores raw snapshots in Azure Data Lake Storage Gen2, and builds a Snowflake Bronze layer for analytics-ready processing and future Medallion Architecture expansion.
 
 ## Architecture Overview
 
 ```text
-API
+Data.gov.il Flights API
 ↓
-Raw JSON Ingestion
+Python API Ingestion
 ↓
-Azure Blob Storage (Raw Layer)
+Azure Data Lake Storage Gen2 (Raw JSON Snapshots)
 ↓
-Processed Transformations
+Snowflake External Stage
 ↓
-Parquet Files
+Bronze Raw Layer (VARIANT JSON)
 ↓
-Azure Blob Storage (Processed Layer)
+Bronze Current Layer (Structured Snapshot)
+↓
+Future Silver / Gold Layers
+↓
+Tableau Dashboards
 ```
 
 ---
@@ -23,47 +27,68 @@ Azure Blob Storage (Processed Layer)
 ## Current Features
 
 ### Data Ingestion
-- Extracts flight data from the Data.gov.il API
-- Stores raw JSON files locally using partitioned folder structure
-- Uploads raw data to Azure Blob Storage
+- Extracts flight data from the Data.gov.il Flights API
+- Saves raw JSON snapshots using partitioned ingestion folders
+- Uploads snapshots to Azure Data Lake Storage Gen2
+- Supports incremental snapshot ingestion
 
-### Data Processing
-- Cleans and transforms raw flight data
-- Renames and standardizes column names
-- Performs datatype casting
-- Handles invalid datetime values safely
-- Removes duplicate rows
-- Standardizes text columns
-- Saves processed data as Parquet files
+---
+
+### Snowflake Bronze Layer
+
+## Bronze Raw Table
+- Stores raw API snapshots as semi-structured JSON
+- Uses Snowflake VARIANT datatype
+- Maintains historical raw ingestion history
+- Stores ingestion metadata:
+  - source file name
+  - ingestion timestamp
+
+## Bronze Current Table
+- Parses and flattens latest snapshot JSON
+- Creates structured analytics-ready flight table
+- Uses LATERAL FLATTEN for JSON array expansion
+- Performs datatype casting and column standardization
+- Always represents the latest API snapshot state
 
 ### Cloud Integration
-- Azure Blob Storage integration
+- Azure Data Lake Storage Gen2 integration
 - Azure Key Vault secret management
-- Secure connection string handling
+- Snowflake External Stage integration
+- Snowflake Storage Integration authentication
+
 
 ### Monitoring & Logging
 - Structured logging system
 - Execution stage tracking
 - Error handling with try/except blocks
-- Record count and processing metadata logging
 
 ### Project Structure
 
 ```text
-data/
+project/
 │
-├── raw/
-│   └── flights/
+├── snowflake_sql/
+│    ├── SETUP/
+│    │   ├── 01_setup.sql
+│    │   ├── 02_storage_integration.sql
+│    │   ├── 03_stage.sql
+│    │   └── 04_create_tables.sql   
+│    │
+│    └── pipelines/
+│        ├── load_raw.sql
+│        └── refresh_current.sql
 │
-├── processed/
-│   └── flights/
+├── python/
+│   ├── ingest.py
+│   ├── upload_to_adls.py
+│   ├── key_vault_config.py
+│   ├── logger_config.py
+│   └── main.py
 │
-├── ingest.py
-├── transform_flights.py
-├── blob_storage.py
-├── key_vault_config.py
-├── logger_config.py
-└── main.py
+└── data/
+    └── raw/
+        └── flights/
 ```
 
 ---
@@ -71,11 +96,14 @@ data/
 ## Technologies Used
 
 - Python
-- Pandas
-- Azure Blob Storage
+- Snowflake
+- Azure Data Lake Storage Gen2
 - Azure Key Vault
+- SQL
 - REST APIs
-- Parquet
+- Apache Airflow (planned)
+- dbt (planned)
+- Tableau (planned)
 - Git & GitHub
 
 ---
@@ -83,11 +111,11 @@ data/
 ## Current Pipeline Flow
 
 1. Extract flight data from API
-2. Save raw JSON locally
-3. Upload raw files to Azure Blob Storage
-4. Transform and clean raw data
-5. Save processed data as Parquet
-6. Upload processed files to Azure Blob Storage
+2. Save raw JSON snapshot locally
+3. Upload snapshot to ADLS Gen2
+4. Snowflake loads new snapshot into Bronze Raw layer
+5. Snowflake refreshes structured current-state table
+6. Future transformations will populate Silver and Gold layers
 
 ---
 
@@ -95,12 +123,11 @@ data/
 
 - Implement full Medallion Architecture (Bronze → Silver → Gold)
 - Add Apache Airflow orchestration
-- Build dimensional models using dbt
-- Add automated data quality validation
-- Add monitoring dashboards
-- Implement CI/CD workflows
-- Add Docker containerization
-- Expand analytics and KPI layers
+- Build transformations and modeling using dbt
+- Build Silver deduplication and business-key logic
+- Add Gold dimensional models and KPI layers
+- Add automated data quality testing
+- Build Tableau dashboards
 
 ---
 
@@ -108,10 +135,11 @@ data/
 
 - Flight delay analysis
 - Airline traffic trends
-- Arrival vs departure analytics
-- Terminal usage analysis
-- Destination popularity metrics
-- Flight status monitoring
+- Airport congestion analytics
+- Arrival vs departure monitoring
+- Destination popularity analysis
+- Flight status tracking
+- Terminal activity analysis
 
 ---
 
@@ -129,8 +157,19 @@ pip install -r requirements.txt
 python main.py
 ```
 
+### Execute Snowflake pipeline
+
+Run SQL scripts in order:
+
+01_setup.sql
+02_storage_integration.sql
+03_stage.sql
+04_create_tables.sql
+pipelines/load_raw.sql
+pipelines/refresh_current.sql
+ 
 ---
 
 ## Author
 
-מיכאל סנדרוביץ'
+Michael Sandrovich

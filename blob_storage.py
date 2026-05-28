@@ -5,7 +5,7 @@ from logger_config import setup_logger
 
 logger = setup_logger()
 
-CONTAINER_NAME = "raw" 
+CONTAINER_NAME = "data" 
 
 
 def get_blob_service_client():
