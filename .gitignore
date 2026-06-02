@@ -4,3 +4,6 @@ __pycache__/
 logs/
 data/
 snowlflake_sql/SETUP/02_storage_integration
+dbt_venv/
+Flights_dbt_proj/logs
+Flights_dbt_proj/dbt_packages
