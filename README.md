@@ -17,7 +17,9 @@ Bronze Raw Layer (VARIANT JSON)
 ↓
 Bronze Current Layer (Structured Snapshot)
 ↓
-Future Silver / Gold Layers
+dbt Silver Layer
+↓
+Future Gold Layer
 ↓
 Tableau Dashboards
 ```
@@ -31,6 +33,23 @@ Tableau Dashboards
 - Saves raw JSON snapshots using partitioned ingestion folders
 - Uploads snapshots to Azure Data Lake Storage Gen2
 - Supports incremental snapshot ingestion
+
+### dbt Silver Layer
+
+- Built using dbt Core and Snowflake
+- Renames source columns using business-friendly naming conventions
+- Standardizes data types and string values
+- Implements flight deduplication logic
+- Selects the latest operational state for each flight
+- Documents models and sources using dbt Docs
+- Includes automated data quality testing
+
+Business Key:
+
+- airline_code
+- flight_number
+- scheduled_time
+- arrival_departure
 
 ---
 
@@ -68,23 +87,37 @@ Tableau Dashboards
 ```text
 project/
 │
-├── snowflake_sql/
-│    ├── SETUP/
-│    │   ├── 01_setup.sql
-│    │   ├── 02_storage_integration.sql
-│    │   ├── 03_stage.sql
-│    │   └── 04_create_tables.sql   
-│    │
-│    └── pipelines/
-│        ├── load_raw.sql
-│        └── refresh_current.sql
+├── Flights_dbt_proj/
+│   ├── models/
+│   │   ├── staging/
+│   │   │   ├── source.yml
+│   │   │   └── stg_flights.sql
+│   │   │
+│   │   ├── docs/
+│   │   │   ├── doc_block.md
+│   │   │   └── doc_block1.md
+│   │   │
+│   │   └── sources.yml
+│   │
+│   ├── packages.yml
+│   └── dbt_project.yml
 │
-├── python/
-│   ├── ingest.py
-│   ├── upload_to_adls.py
-│   ├── key_vault_config.py
-│   ├── logger_config.py
-│   └── main.py
+├── snowflake_sql/
+│   ├── SETUP/
+│   │   ├── 01_setup.sql
+│   │   ├── 02_storage_integration.sql
+│   │   ├── 03_stage.sql
+│   │   └── 04_create_tables.sql
+│   │
+│   └── pipelines/
+│       ├── load_raw.sql
+│       └── refresh_current.sql
+│
+├── ingest.py
+├── key_vault_config.py
+├── logger_config.py
+├── blob_storage.py
+├── main.py
 │
 └── data/
     └── raw/
@@ -101,8 +134,8 @@ project/
 - Azure Key Vault
 - SQL
 - REST APIs
+- DBT Core
 - Apache Airflow (planned)
-- dbt (planned)
 - Tableau (planned)
 - Git & GitHub
 
@@ -115,18 +148,18 @@ project/
 3. Upload snapshot to ADLS Gen2
 4. Snowflake loads new snapshot into Bronze Raw layer
 5. Snowflake refreshes structured current-state table
-6. Future transformations will populate Silver and Gold layers
+6. dbt transforms Bronze data into a cleaned Silver model
+7. Future Gold models will support analytical reporting
 
 ---
 
 ## Planned Improvements
 
 - Implement full Medallion Architecture (Bronze → Silver → Gold)
-- Add Apache Airflow orchestration
-- Build transformations and modeling using dbt
-- Build Silver deduplication and business-key logic
-- Add Gold dimensional models and KPI layers
-- Add automated data quality testing
+- Build Gold dimensional models
+- Create fact and dimension tables
+- Add incremental dbt models
+- Implement Apache Airflow orchestration
 - Build Tableau dashboards
 
 ---
