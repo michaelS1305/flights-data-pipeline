@@ -1,8 +1,76 @@
 version: 2
+
 sources:
   - name: bronze
     database: flights_project
     schema: bronze
+    description: "{{ doc('bronze_flights_current') }}"
 
     tables:
       - name: flights_current
+        description:  >
+            Current-state flight records parsed from the latest raw snapshot
+            ingested from the Israeli Government Flights API. This table contains
+            structured flight data representing the most recent available state
+            of arrivals and departures.
+
+        columns:
+          - name: record_id
+            description: "Unique record identifier provided by the source API."
+
+          - name: operator_code
+            description: "Airline operator code associated with the flight."
+
+          - name: flight_number
+            description: "Flight number assigned by the airline."
+
+          - name: operator_name
+            description: "Name of the airline operating the flight."
+
+          - name: scheduled_time
+            description: "Scheduled arrival or departure time published by the airport authority."
+
+          - name: actual_time
+            description: "Actual reported arrival or departure time when available."
+
+          - name: arrival_departure
+            description: "Indicates whether the flight is an arrival or departure."
+
+          - name: destination_airport_code
+            description: "IATA airport code of the destination or origin airport."
+
+          - name: destination_city_en
+            description: "Destination or origin city name in English."
+
+          - name: destination_city_he
+            description: "Destination or origin city name in Hebrew."
+
+          - name: destination_city_alt
+            description: "Alternative city name representation provided by the source."
+
+          - name: destination_country_he
+            description: "Destination or origin country name in Hebrew."
+
+          - name: destination_country_en
+            description: "Destination or origin country name in English."
+
+          - name: terminal
+            description: "Airport terminal associated with the flight."
+
+          - name: checkin_counter
+            description: "Assigned check-in counter range when available."
+
+          - name: checkin_zone
+            description: "Assigned check-in zone when available."
+
+          - name: status_en
+            description: "Current flight status in English."
+
+          - name: status_he
+            description: "Current flight status in Hebrew."
+
+          - name: source_file_name
+            description: "Name of the raw JSON file loaded into the Bronze layer."
+
+          - name: loaded_at
+            description: "Timestamp indicating when the record was loaded into Snowflake."

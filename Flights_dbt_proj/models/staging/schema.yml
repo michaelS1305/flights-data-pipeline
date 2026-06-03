@@ -1,0 +1,99 @@
+version: 2
+
+models:
+- name: stg_flights
+
+  description: "{{ doc('stg_flights_overview') }}"
+
+  tests:
+  - dbt_utils.unique_combination_of_columns:
+      arguments:
+        combination_of_columns:
+          - airline_code
+          - flight_number
+          - scheduled_time
+          - arrival_departure
+ 
+  columns:
+  - name: airline_code
+    description: " Airlline operator code."
+    tests: 
+      - not_null
+
+  - name: flight_number
+    description: " Flight number as provided by the source API."
+    tests: 
+      - not_null
+
+  - name: airline_name
+    description: " Airline operator name."
+    tests: 
+      - not_null
+
+  - name: scheduled_time
+    description: " Scheduled flight time."
+    tests: 
+      - not_null
+
+  - name: actual_time
+    description: " Actual reported flight time."
+    
+
+  - name: arrival_departure
+    description: " Indicates whether the flight is an arrival or departure."
+    tests: 
+      - not_null
+      - accepted_values:
+          arguments:
+            values: 
+              - 'A'
+              - 'D'
+
+  - name: airport_code
+    description: " Destination or origin airport code, depending on arrival/departure direction."
+    tests: 
+      - not_null
+
+  - name: city_name
+    description: " Destination or origin city name as provided by the API."
+    tests: 
+      - not_null
+
+  - name: country_name
+    description: " Destination or origin country name."
+    tests: 
+      - not_null
+
+  - name: terminal
+    description: " Terminal number stored as string."
+    tests: 
+      - not_null
+
+  - name: check_in_counter_range
+    description: " Check-in counter range when relevant."
+
+  - name: check_in_zone
+    description: " Check-in zone when relevant."
+
+  - name: status
+    description: " Current flight status."
+    tests: 
+      - not_null
+      - accepted_values:
+          arguments:
+            values:
+              - 'CANCELED'
+              - 'DELAYED'
+              - 'DEPARTED'
+              - 'EARLY'
+              - 'FINAL'
+              - 'LANDED'
+              - 'LANDING'
+              - 'NOT FINAL'
+              - 'ON TIME'
+      
+
+  - name: loaded_at
+    description: " Timestamp when the raw snapshot was loaded into Snowflake."
+    tests: 
+      - not_null

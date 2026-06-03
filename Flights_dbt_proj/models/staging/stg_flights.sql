@@ -55,6 +55,20 @@ final as (
 
 )
 
-select *
+select
+    airline_code,
+    flight_number,
+    airline_name,
+    scheduled_time,
+    actual_time,
+    arrival_departure,
+    airport_code,
+    city_name,
+    country_name,
+    terminal,
+    check_in_counter_range,
+    check_in_zone,
+    status,
+    loaded_at
 from final
 where rn = 1

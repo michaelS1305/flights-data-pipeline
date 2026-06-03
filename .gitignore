@@ -7,3 +7,4 @@ snowlflake_sql/SETUP/02_storage_integration
 dbt_venv/
 Flights_dbt_proj/logs
 Flights_dbt_proj/dbt_packages
+Flights_dbt_proj\package-lock.yml
