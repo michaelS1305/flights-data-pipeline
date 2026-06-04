@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: fact_flights
+    description: "{{ doc('fact_flights') }}"
+
+    columns:
+
+      - name: flight_key
+        description: "Surrogate key uniquely identifying a flight."
+        data_tests:
+          - unique
+          - not_null
+          
+      - name: airline_code
+        description: "Surrogate key uniquely identifying a flight."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: airline_key
+        description: "Foreign key referencing dim_airlines."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_airlines')
+                field: airline_key
+
+      - name: airport_key
+        description: "Foreign key referencing dim_airports."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_airports')
+                field: airport_key
+
+      - name: status_key
+        description: "Foreign key referencing dim_status."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_status')
+                field: status_key
+
+      - name: flight_number
+        description: "Flight number assigned by the airline."
+
+      - name: scheduled_time
+        description: "Scheduled departure or arrival time."
+
+      - name: actual_time
+        description: "Actual departure or arrival time."
+
+      - name: arrival_departure
+        description: "Indicates whether the flight is an arrival (A) or departure (D)."
+
+      - name: terminal
+        description: "Airport terminal associated with the flight."
+
+      - name: check_in_counter_range
+        description: "Range of check-in counters assigned to the flight."
+
+      - name: check_in_zone
+        description: "Check-in zone assigned to the flight."
+
+      - name: loaded_at
+        description: "Timestamp when the record was loaded into the warehouse."

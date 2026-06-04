@@ -1,6 +1,6 @@
 # Flights Data Pipeline
 
-Cloud-based data engineering project that ingests flight data from the Israeli Government API, stores raw snapshots in Azure Data Lake Storage Gen2, and builds a Snowflake Bronze layer for analytics-ready processing and future Medallion Architecture expansion.
+Cloud-based data engineering project that ingests flight data from the Israeli Government API, stores raw snapshots in Azure Data Lake Storage Gen2, and transforms the data through a Medallion Architecture in Snowflake using dbt.
 
 ## Architecture Overview
 
@@ -19,9 +19,12 @@ Bronze Current Layer (Structured Snapshot)
 ↓
 dbt Silver Layer
 ↓
-Future Gold Layer
+dbt Gold Layer (Star Schema)
 ↓
-Tableau Dashboards
+Future Airflow Orchestration
+↓
+Future Tableau Dashboards
+
 ```
 
 ---
@@ -50,6 +53,24 @@ Business Key:
 - flight_number
 - scheduled_time
 - arrival_departure
+
+### dbt Gold Layer
+
+- Implements a dimensional star schema
+- Builds analytical fact and dimension models
+- Generates surrogate keys using dbt_utils
+- Enforces referential integrity through relationship tests
+- Includes data quality testing for dimensions and facts
+
+Dimensions:
+
+- dim_airlines
+- dim_airports
+- dim_status
+
+Fact Table:
+
+- fact_flights
 
 ---
 
@@ -88,19 +109,29 @@ Business Key:
 project/
 │
 ├── Flights_dbt_proj/
-│   ├── models/
-│   │   ├── staging/
-│   │   │   ├── source.yml
-│   │   │   └── stg_flights.sql
-│   │   │
-│   │   ├── docs/
-│   │   │   ├── doc_block.md
-│   │   │   └── doc_block1.md
-│   │   │
-│   │   └── sources.yml
-│   │
-│   ├── packages.yml
-│   └── dbt_project.yml
+│ ├── models/
+│ │
+│ │ ├── staging/
+│ │ │ ├── source.yml
+│ │ │ └── stg_flights.sql
+│ │ │
+│ │ ├── marts/
+│ │ │ ├── dimensions/
+│ │ │ │ ├── dim_airlines.sql
+│ │ │ │ ├── dim_airports.sql
+│ │ │ │ ├── dim_status.sql
+│ │ │ │ └── dim.yml
+│ │ │ │
+│ │ │ └── fact/
+│ │ │ ├── fact_flights.sql
+│ │ │ └── facts.yml
+│ │ │
+│ │ └── docs/
+│ │ ├── dimensions.md
+│ │ └── facts.md
+│ │
+│ ├── packages.yml
+│ └── dbt_project.yml
 │
 ├── snowflake_sql/
 │   ├── SETUP/
@@ -149,15 +180,15 @@ project/
 4. Snowflake loads new snapshot into Bronze Raw layer
 5. Snowflake refreshes structured current-state table
 6. dbt transforms Bronze data into a cleaned Silver model
-7. Future Gold models will support analytical reporting
+7. dbt builds Gold dimension and fact models
+8. Gold layer exposes an analytical star schema for reporting
+
 
 ---
 
 ## Planned Improvements
 
-- Implement full Medallion Architecture (Bronze → Silver → Gold)
-- Build Gold dimensional models
-- Create fact and dimension tables
+- Add automated scheduling and monitoring
 - Add incremental dbt models
 - Implement Apache Airflow orchestration
 - Build Tableau dashboards

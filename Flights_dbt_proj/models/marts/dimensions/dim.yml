@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_airports
+    description: "{{ doc('dimensions_overview') }}"
+
+    columns:
+      - name: airport_key
+        description: "Surrogate key generated from airport_code."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: airport_code
+        description: "Business key representing the destination airport code."
+
+      - name: city_name
+        description: "Destination city name."
+
+      - name: country_name
+        description: "Destination country name."
+
+  - name: dim_airlines
+    description: "{{ doc('dimensions_overview') }}"
+
+    columns:
+      - name: airline_key
+        description: "Surrogate key generated from airline_code."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: airline_code
+        description: "Business key representing the airline code."
+
+      - name: airline_name
+        description: "Airline name."
+
+  - name: dim_status
+    description: "{{ doc('dimensions_overview') }}"
+
+    columns:
+      - name: status_key
+        description: "Surrogate key generated from status."
+        data_tests:
+          - unique
+          - not_null
+
+      - name: status
+        description: "Flight status."
