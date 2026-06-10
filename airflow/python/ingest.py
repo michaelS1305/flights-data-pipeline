@@ -2,7 +2,10 @@ import requests
 import json
 from datetime import datetime
 from pathlib import Path
-from logger_config import setup_logger
+try:
+    from .logger_config import setup_logger
+except ImportError:
+    from logger_config import setup_logger
 
 logger = setup_logger()
 
@@ -23,7 +26,7 @@ def ingest_flights():
         logger.info("Response converted to JSON successfully")
 
         folder = Path(
-            f"data/raw/flights/"
+            f"/opt/project/data/raw/flights/"
             f"ingestion_date={now.date()}/"
             f"ingestion_time={now.strftime('%H-%M-%S')}"
         )
@@ -39,7 +42,7 @@ def ingest_flights():
         logger.info(f"Raw JSON saved successfully to: {file_path}")
         logger.info("Flights ingestion process finished successfully")
 
-        return file_path
+        return str(file_path)
 
     except Exception as e:
         logger.error(f"Flights ingestion process failed: {e}")

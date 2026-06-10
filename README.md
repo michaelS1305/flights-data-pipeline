@@ -108,6 +108,24 @@ Fact Table:
 ```text
 project/
 │
+├── airflow/
+│   ├── airflow/
+│   |  └── dags
+|   |     └── flights_piprline.py
+|   |
+|   ├── python/
+|   │  ├── ingest.py
+|   │  ├── key_vault_config.py 
+|   │  ├── logger_config.py 
+|   │  └── blob_storage.py 
+|   |
+|   ├── data/
+|   |  └── raw/
+|   |     └── flights/
+|   |
+|   ├── docker-compose.yml
+|   └──dockerfile
+|
 ├── Flights_dbt_proj/
 │ ├── models/
 │ │
@@ -133,26 +151,16 @@ project/
 │ ├── packages.yml
 │ └── dbt_project.yml
 │
-├── snowflake_sql/
-│   ├── SETUP/
-│   │   ├── 01_setup.sql
-│   │   ├── 02_storage_integration.sql
-│   │   ├── 03_stage.sql
-│   │   └── 04_create_tables.sql
-│   │
-│   └── pipelines/
-│       ├── load_raw.sql
-│       └── refresh_current.sql
-│
-├── ingest.py
-├── key_vault_config.py
-├── logger_config.py
-├── blob_storage.py
-├── main.py
-│
-└── data/
-    └── raw/
-        └── flights/
+└──snowflake_sql/
+   ├── SETUP/
+   │  ├── 01_setup.sql
+   │  ├── 02_storage_integration.sql
+   │  ├── 03_stage.sql
+   │  └── 04_create_tables.sql
+   │
+   └── pipelines/
+     ├── load_raw.sql
+     └── refresh_current.sql
 ```
 
 ---

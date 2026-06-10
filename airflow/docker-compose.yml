@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  sleek-airflow:
+    image: azurepipelineproject:latest 
+
+    volumes:
+      - ./airflow:/opt/airflow
+      - ./python:/opt/project/python
+      - ./data:/opt/project/data
+
+    ports:
+      - "8080:8080"
+
+    command: airflow standalone

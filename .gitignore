@@ -2,9 +2,14 @@ __pycache__/
 *.pyc
 .env
 logs/
-data/
+airflow/data
 snowlflake_sql/SETUP/02_storage_integration
 dbt_venv/
 Flights_dbt_proj/logs
 Flights_dbt_proj/dbt_packages
-Flights_dbt_proj\package-lock.yml
+Flights_dbt_proj/package-lock.yml
+airflow/airflow/airflow.cfg
+airflow/airflow/airflow.db
+airflow/airflow/airflow.db-shm
+airflow/airflow/airflow.db-wal
+airflow/airflow/simple_auth_manager_passwords.json.generated

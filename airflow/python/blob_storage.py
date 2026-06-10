@@ -50,3 +50,5 @@ def download_latest_blob(prefix: str, local_download_path: Path):
     logger.info(f"Downloaded blob to: {local_download_path}")
 
     return local_download_path
+
+
