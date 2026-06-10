@@ -2,7 +2,7 @@ __pycache__/
 *.pyc
 .env
 logs/
-airflow/data
+airflow/airflow/data
 snowlflake_sql/SETUP/02_storage_integration
 dbt_venv/
 Flights_dbt_proj/logs
