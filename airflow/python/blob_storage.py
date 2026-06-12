@@ -1,7 +1,13 @@
 from pathlib import Path
 from azure.storage.blob import BlobServiceClient
-from key_vault_config import get_secret
-from logger_config import setup_logger
+try:
+    from .key_vault_config import get_secret
+except:
+    from key_vault_config import get_secret
+try:
+    from .logger_config import setup_logger
+except ImportError:
+    from logger_config import setup_logger
 
 logger = setup_logger()
 

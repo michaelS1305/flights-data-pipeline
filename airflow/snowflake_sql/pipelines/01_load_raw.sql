@@ -1,3 +1,4 @@
+ALTER SESSION SET TIMEZONE = 'UTC';
 USE DATABASE flights_project;
 USE SCHEMA bronze;
 USE WAREHOUSE flights_wh;

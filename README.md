@@ -1,6 +1,14 @@
-# Flights Data Pipeline
+# Flights Data Engineering Pipeline
 
-Cloud-based data engineering project that ingests flight data from the Israeli Government API, stores raw snapshots in Azure Data Lake Storage Gen2, and transforms the data through a Medallion Architecture in Snowflake using dbt.
+End-to-end cloud data engineering project that ingests flight data from the Israeli Government Flights API, stores raw data in Azure Data Lake Storage Gen2, processes and models data in Snowflake using dbt, orchestrates workflows with Apache Airflow, and delivers analytics-ready datasets for Tableau dashboards.
+
+---
+
+## Project Goal
+
+The purpose of this project is to demonstrate the design and implementation of a production-style data engineering solution. The project covers the complete data lifecycle, including data ingestion, cloud storage, data warehousing, transformation, orchestration, data quality validation, and analytical modeling using modern data engineering technologies.
+
+---
 
 ## Architecture Overview
 
@@ -21,7 +29,7 @@ dbt Silver Layer
 ↓
 dbt Gold Layer (Star Schema)
 ↓
-Future Airflow Orchestration
+Airflow Orchestration
 ↓
 Future Tableau Dashboards
 
@@ -29,15 +37,43 @@ Future Tableau Dashboards
 
 ---
 
-## Current Features
+## Tech Stack
 
-### Data Ingestion
+| Category | Technologies |
+|-----------|-------------|
+| Programming | Python |
+| Version Control | Git, GitHub |
+| Containerization | Docker |
+| Cloud Storage | Azure Data Lake Storage Gen2 (ADLS) |
+| Secrets Management | Azure Key Vault |
+| Data Warehouse | Snowflake |
+| Data Transformation | dbt Core |
+| Orchestration | Apache Airflow |
+| Data Visualization | Tableau |
+| Data Source | Data.gov.il Flights API |
+
+---
+
+## Medallion Architecture & Pipeline Components
+
+### Bronze Layer - Raw Data Ingestion
+
+The Bronze layer captures raw flight data from the Israeli Government Flights API and preserves the original source records for traceability and historical analysis.
+
+Features:
+
 - Extracts flight data from the Data.gov.il Flights API
 - Saves raw JSON snapshots using partitioned ingestion folders
 - Uploads snapshots to Azure Data Lake Storage Gen2
 - Supports incremental snapshot ingestion
+- Loads raw JSON data into Snowflake Bronze tables
+- Preserves source data without business transformations
 
-### dbt Silver Layer
+### Silver Layer - Data Standardization & Cleansing
+
+The Silver layer transforms raw flight records into a clean, standardized, and analytics-ready dataset using dbt and Snowflake.
+
+Features:
 
 - Built using dbt Core and Snowflake
 - Renames source columns using business-friendly naming conventions
@@ -54,7 +90,15 @@ Business Key:
 - scheduled_time
 - arrival_departure
 
-### dbt Gold Layer
+## dbt Lineage
+
+![dbt Lineage](docs/images/dbt_lineage.png)
+
+### Gold Layer - Dimensional Modeling
+
+The Gold layer applies dimensional modeling principles to create a business-friendly star schema optimized for analytics and reporting.
+
+Features:
 
 - Implements a dimensional star schema
 - Builds analytical fact and dimension models
@@ -72,174 +116,103 @@ Fact Table:
 
 - fact_flights
 
----
+## Gold Data Model
 
-### Snowflake Bronze Layer
+![Gold Model](docs/images/gold_model.png)
 
-## Bronze Raw Table
-- Stores raw API snapshots as semi-structured JSON
-- Uses Snowflake VARIANT datatype
-- Maintains historical raw ingestion history
-- Stores ingestion metadata:
-  - source file name
-  - ingestion timestamp
+### Apache Airflow Orchestration
 
-## Bronze Current Table
-- Parses and flattens latest snapshot JSON
-- Creates structured analytics-ready flight table
-- Uses LATERAL FLATTEN for JSON array expansion
-- Performs datatype casting and column standardization
-- Always represents the latest API snapshot state
+Apache Airflow orchestrates the end-to-end pipeline and automates the movement and transformation of data across all layers.
 
-### Cloud Integration
-- Azure Data Lake Storage Gen2 integration
-- Azure Key Vault secret management
-- Snowflake External Stage integration
-- Snowflake Storage Integration authentication
+Pipeline Tasks:
 
+- Flight data ingestion
+- Upload to Azure Data Lake Storage Gen2
+- Snowflake Bronze layer loading
+- Bronze refresh process
+- dbt Silver transformations
+- dbt Gold transformations
+- Automated data quality testing
+- End-to-end workflow orchestration
 
-### Monitoring & Logging
-- Structured logging system
-- Execution stage tracking
-- Error handling with try/except blocks
+## Airflow Orchestration
+
+![Airflow DAG](docs/images/airflow_dag.png)
+
 
 ### Project Structure
 
 ```text
+```text
 project/
 │
 ├── airflow/
+│   │
 │   ├── airflow/
-│   |  └── dags
-|   |     └── flights_piprline.py
-|   |
-|   ├── python/
-|   │  ├── ingest.py
-|   │  ├── key_vault_config.py 
-|   │  ├── logger_config.py 
-|   │  └── blob_storage.py 
-|   |
-|   ├── data/
-|   |  └── raw/
-|   |     └── flights/
-|   |
-|   ├── docker-compose.yml
-|   └──dockerfile
-|
-├── Flights_dbt_proj/
-│ ├── models/
-│ │
-│ │ ├── staging/
-│ │ │ ├── source.yml
-│ │ │ └── stg_flights.sql
-│ │ │
-│ │ ├── marts/
-│ │ │ ├── dimensions/
-│ │ │ │ ├── dim_airlines.sql
-│ │ │ │ ├── dim_airports.sql
-│ │ │ │ ├── dim_status.sql
-│ │ │ │ └── dim.yml
-│ │ │ │
-│ │ │ └── fact/
-│ │ │ ├── fact_flights.sql
-│ │ │ └── facts.yml
-│ │ │
-│ │ └── docs/
-│ │ ├── dimensions.md
-│ │ └── facts.md
-│ │
-│ ├── packages.yml
-│ └── dbt_project.yml
+│   │   └── dags/
+│   │       └── flights_pipeline.py
+│   │
+│   ├── python/
+│   │   ├── __init__.py
+│   │   ├── ingest.py
+│   │   ├── key_vault_config.py
+│   │   ├── logger_config.py
+│   │   └── blob_storage.py
+│   │
+│   ├── data/
+│   │   └── raw/
+│   │       └── flights/
+│   │
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── .env
+│   │
+│   └── snowflake_sql/
+│       ├── SETUP/
+│       │   ├── 01_setup.sql
+│       │   ├── 02_storage_integration.sql
+│       │   ├── 03_stage.sql
+│       │   └── 04_create_tables.sql
+│       │
+│       └── pipelines/
+│           ├── load_raw.sql
+│           └── refresh_current.sql
 │
-└──snowflake_sql/
-   ├── SETUP/
-   │  ├── 01_setup.sql
-   │  ├── 02_storage_integration.sql
-   │  ├── 03_stage.sql
-   │  └── 04_create_tables.sql
-   │
-   └── pipelines/
-     ├── load_raw.sql
-     └── refresh_current.sql
+└── Flights_dbt_proj/
+    │
+    ├── models/
+    │   │
+    │   ├── staging/
+    │   │   ├── source.yml
+    │   │   └── stg_flights.sql
+    │   │
+    │   ├── marts/
+    │   │   ├── dimensions/
+    │   │   │   ├── dim_airlines.sql
+    │   │   │   ├── dim_airports.sql
+    │   │   │   ├── dim_status.sql
+    │   │   │   └── dim.yml
+    │   │   │
+    │   │   └── fact/
+    │   │       ├── fact_flights.sql
+    │   │       └── facts.yml
+    │   │
+    │   └── docs/
+    │       ├── dimensions.md
+    │       └── facts.md
+    │
+    ├── macros/
+    │   └── generate_schema_name.sql
+    │
+    ├── packages.yml
+    └── dbt_project.yml
 ```
-
----
-
-## Technologies Used
-
-- Python
-- Snowflake
-- Azure Data Lake Storage Gen2
-- Azure Key Vault
-- SQL
-- REST APIs
-- DBT Core
-- Apache Airflow (planned)
-- Tableau (planned)
-- Git & GitHub
-
----
-
-## Current Pipeline Flow
-
-1. Extract flight data from API
-2. Save raw JSON snapshot locally
-3. Upload snapshot to ADLS Gen2
-4. Snowflake loads new snapshot into Bronze Raw layer
-5. Snowflake refreshes structured current-state table
-6. dbt transforms Bronze data into a cleaned Silver model
-7. dbt builds Gold dimension and fact models
-8. Gold layer exposes an analytical star schema for reporting
-
 
 ---
 
 ## Planned Improvements
-
-- Add automated scheduling and monitoring
-- Add incremental dbt models
-- Implement Apache Airflow orchestration
 - Build Tableau dashboards
 
----
-
-## Future Analytics Ideas
-
-- Flight delay analysis
-- Airline traffic trends
-- Airport congestion analytics
-- Arrival vs departure monitoring
-- Destination popularity analysis
-- Flight status tracking
-- Terminal activity analysis
-
----
-
-## How to Run
-
-### Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Run the pipeline
-
-```bash
-python main.py
-```
-
-### Execute Snowflake pipeline
-
-Run SQL scripts in order:
-
-01_setup.sql
-02_storage_integration.sql
-03_stage.sql
-04_create_tables.sql
-pipelines/load_raw.sql
-pipelines/refresh_current.sql
- 
 ---
 
 ## Author

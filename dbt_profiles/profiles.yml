@@ -1,0 +1,13 @@
+Flights_dbt_proj:
+  outputs:
+    dev:
+      account: ajnyypj-xr97769
+      database: flights_project
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ACCOUNTADMIN
+      schema: PUBLIC
+      threads: 4
+      type: snowflake
+      user: MICHAELS13
+      warehouse: flights_wh
+  target: dev

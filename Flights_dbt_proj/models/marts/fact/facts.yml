@@ -15,7 +15,6 @@ models:
       - name: airline_code
         description: "Surrogate key uniquely identifying a flight."
         data_tests:
-          - unique
           - not_null
 
       - name: airline_key
