@@ -31,7 +31,7 @@ dbt Gold Layer (Star Schema)
 ↓
 Airflow Orchestration
 ↓
-Future Tableau Dashboards
+Power BI Dashboard
 
 ```
 
@@ -49,7 +49,7 @@ Future Tableau Dashboards
 | Data Warehouse | Snowflake |
 | Data Transformation | dbt Core |
 | Orchestration | Apache Airflow |
-| Data Visualization | Tableau |
+| Data Visualization | Power BI |
 | Data Source | Data.gov.il Flights API |
 
 ---
