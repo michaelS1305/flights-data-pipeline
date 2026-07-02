@@ -16,4 +16,4 @@ airflow/.env
 airflow/dbt_profiles
 airflow/airflow/data
 airflow/data
-airflow/snowlflake_sql/SETUP/02_storage_integration
+airflow/snowflake_sql/SETUP/02_storage_integration
